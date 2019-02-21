@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: mitose
-        image: luizalabs/mitose:0.0.1
+        image: hugobcar/mitose:latest
         env:
         - name: PORT
           value: "5000"
@@ -32,3 +32,14 @@ spec:
   selector:
     run: mitose
   type: ClusterIP
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: mitose
+rules:
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames: ["config"]
+  verbs: ["get", "watch", "list", "update"]
+

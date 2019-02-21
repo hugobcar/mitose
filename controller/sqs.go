@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"math"
 	"strconv"
+	"log"
 
 	"github.com/luizalabs/mitose/aws"
 	"github.com/luizalabs/mitose/config"
@@ -47,6 +48,13 @@ func (s *SQSColector) GetMetrics() (Metrics, error) {
 		}
 		msgsInQueue += n
 	}
+
+	log.Printf(
+		"Messages in Queue (%s): %d\n",
+		s.queueURLs,
+		msgsInQueue,
+	)
+
 	s.gMetrics.Set(float64(msgsInQueue))
 	return Metrics{msgsInQueueMetricName: strconv.Itoa(msgsInQueue)}, nil
 }

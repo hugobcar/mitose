@@ -41,7 +41,11 @@ func main() {
 		case err := <-errChan:
 			log.Println("error received on errChan:", err)
 			if err != nil && err != context.Canceled {
-				printErrorAndExit("running controllers", err)
+				// printErrorAndExit("running controllers", err)
+				log.Printf(
+					"running controllers (%s)\n",
+					err,
+				)
 			}
 		}
 	}
