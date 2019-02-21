@@ -1,11 +1,15 @@
-apiVersion: apps/v1beta1
+apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   labels:
     run: mitose
   name: mitose
+  namespace: mitose
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      run: mitose
   template:
     metadata:
       labels:
@@ -13,33 +17,27 @@ spec:
     spec:
       containers:
       - name: mitose
-        image: hugobcar/mitose:latest
-        env:
-        - name: PORT
-          value: "5000"
+        image: hugobcar/mitose:v0.0.1
+        imagePullPolicy: Always
+      restartPolicy: Always
+      serviceAccount: mitose
+      serviceAccountName: mitose
 ---
 apiVersion: v1
-kind: Service
+kind: ServiceAccount
 metadata:
-  annotations:
-    prometheus.io/scrape: "true"
   name: mitose
-spec:
-  ports:
-  - port: 80
-    protocol: TCP
-    targetPort: 5000
-  selector:
-    run: mitose
-  type: ClusterIP
+  namespace: mitose
 ---
-kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
 metadata:
   name: mitose
-rules:
-- apiGroups: [""]
-  resources: ["configmaps"]
-  resourceNames: ["config"]
-  verbs: ["get", "watch", "list", "update"]
-
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: mitose
+  namespace: mitose
