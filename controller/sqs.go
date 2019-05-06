@@ -2,9 +2,10 @@ package controller
 
 import (
 	"encoding/json"
-	"math"
-	"strconv"
 	"log"
+	"math"
+	"os"
+	"strconv"
 
 	"github.com/luizalabs/mitose/aws"
 	"github.com/luizalabs/mitose/config"
@@ -19,8 +20,6 @@ const (
 
 type SQSControlerConfig struct {
 	config.Config
-	Key        string   `json:"key"`
-	Secret     string   `json:"secret"`
 	Region     string   `json:"region"`
 	QueueURLs  []string `json:"queue_urls"`
 	MsgsPerPod int      `json:"msgs_per_pod"`
@@ -114,12 +113,16 @@ func NewSQSCruncher(g gauge.Gauge, max, min, msgsPerPod int) Cruncher {
 
 func NewSQSController(confJSON string) (*Controller, error) {
 	conf := new(SQSControlerConfig)
+
+	awsKey := os.Getenv("AWSKEY")
+	awsSecret := os.Getenv("AWSSECRET")
+
 	if err := json.Unmarshal([]byte(confJSON), conf); err != nil {
 		return nil, err
 	}
 
 	gColector := gauge.NewPrometheusGauge(conf.Namespace, conf.Deployment, "SQS")
-	colector := NewSQSColector(gColector, conf.Key, conf.Secret, conf.Region, conf.QueueURLs...)
+	colector := NewSQSColector(gColector, awsKey, awsSecret, conf.Region, conf.QueueURLs...)
 
 	gCruncher := gauge.NewPrometheusGauge(conf.Namespace, conf.Deployment, "CRUNCHER")
 	cruncher := NewSQSCruncher(gCruncher, conf.Max, conf.Min, conf.MsgsPerPod)
