@@ -61,7 +61,13 @@ func getConfigWatcher(namespace string) <-chan error {
 }
 
 func run(ctx context.Context, currentNS string) error {
-	configData, err := k8s.GetConfigMapData(currentNS, "config")
+	configMap := os.Getenv("CONFIGMAP")
+
+	if configMap == "" {
+		configMap = "config"
+	}
+
+	configData, err := k8s.GetConfigMapData(currentNS, configMap)
 	if err != nil {
 		return err
 	}
