@@ -19,6 +19,19 @@ spec:
       - name: mitose
         image: hugobcar/mitose:v0.0.1
         imagePullPolicy: Always
+        env:
+          - name: AWSKEY
+            valueFrom:
+              secretKeyRef:
+                name: aws-mitose
+                key: key
+          - name: AWSSECRET
+            valueFrom:
+              secretKeyRef:
+                name: aws-mitose
+                key: secret
+          - name: CONFIGMAP
+            value: config
       restartPolicy: Always
       serviceAccount: mitose
       serviceAccountName: mitose
